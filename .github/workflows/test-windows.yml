@@ -1,0 +1,57 @@
+name: Test Windows
+
+on:  [ push, pull_request ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [python3]
+        #cxx: [clang++]
+        std: [c++11]
+
+    container:
+      image: teeks99/boost-msvc:14.2
+
+    steps:
+    - uses: actions/checkout@v2
+    #- name: setup
+    #  uses: actions/setup-python@v2
+    #  #with:
+    #  #  python-version: ${{ matrix.python-version }}
+    - name: setup python
+      uses: actions/setup-python@v2
+    - name: setup prerequisites
+      uses: lukka/run-vcpkg@dev/fix_key_computation
+      id: runvcpkg
+      with:
+        vcpkgArguments: boost-python
+        vcpkgTriplet: x64-windows
+        #vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+        #vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
+
+      #run: |
+      #  ./vcpkg install boost:x86-windows-static
+      #  python -m pip install --upgrade pip
+      #  python -m pip install setuptools faber
+    #- name: build
+    #  run: |
+    #    python --version
+    #    ${{ matrix.cxx }} --version
+    #    faber -v
+    #    sed -e "s/\$PYTHON/python/g" .ci/faber > ~/.faber
+    #    faber \
+    #      --builddir=build \
+    #      cxx.name=${{ matrix.cxx }} \
+    #      cxxflags=-std=${{ matrix.std }} \
+    #      -j`sysctl -n hw.ncpu`
+    #- name: test
+    #  run: |
+    #    faber \
+    #      --builddir=build\
+    #      cxx.name=${{ matrix.cxx }} \
+    #      cxxflags=-std=${{ matrix.std }} \
+    #      -j`sysctl -n hw.ncpu` \
+    #      test.report

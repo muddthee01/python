@@ -12,13 +12,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: ilammy/msvc-dev-cmd@v1
-    #- uses: warrenbuckley/setup-vswhere@v1
     - uses: actions/setup-python@v2
     - name: setup boost prerequisites
       uses: lukka/run-vcpkg@v6
       with:
-        #vcpkgArguments: boost:x64-windows
+        vcpkgArguments: boost:x64-windows
         vcpkgGitCommitId: '8a9a97315aefb3f8bc5d81bf66ca0025938b9c91'
 
     - name: setup faber
@@ -27,18 +25,13 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install setuptools faber
     - name: build
-      shell: 'bash'
+      shell: cmd
+      #sed -e "s/\$PYTHON/python/g" .ci/faber > ~/.faber
       run: |
-        faber -v
-        sed -e "s/\$PYTHON/python/g" .ci/faber > ~/.faber
         faber --info=tools cxx
-        faber \
-          --builddir=build \
-          cxx.name=msvc
+        faber --builddir=build cxx.name=msvc --with-boost-includes=C:\Tools\vcpkg\installed\x64-windows\include
     - name: test
-      shell: 'bash'
+      shell: cmd
+      #cxx.name=msvc \
       run: |
-        faber \
-          --builddir=build \
-          cxx.name=msvc \
-          test.report
+        faber --builddir=build test.report
